@@ -20,6 +20,10 @@ from transformers import pipeline
 import librosa
 import numpy as np
 from pydub import AudioSegment
+import imageio_ffmpeg
+
+# به‌جای نصب ffmpeg روی سیستم، از نسخه‌ی همراه پایتون استفاده می‌کنیم
+AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
