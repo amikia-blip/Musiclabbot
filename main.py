@@ -19,11 +19,10 @@ from telegram.ext import Application, MessageHandler, ContextTypes, filters
 from transformers import pipeline
 import librosa
 import numpy as np
-from pydub import AudioSegment
 import imageio_ffmpeg
+import subprocess
 
-# به‌جای نصب ffmpeg روی سیستم، از نسخه‌ی همراه پایتون استفاده می‌کنیم
-AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
+FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -45,10 +44,15 @@ logger.info("مدل با موفقیت بارگذاری شد.")
 
 def convert_to_wav(input_path: str) -> str:
     """هر فرمت صوتی (ogg, mp3, m4a, ...) را به wav ۱۶kHz تبدیل می‌کند."""
-    audio = AudioSegment.from_file(input_path)
-    audio = audio.set_frame_rate(16000).set_channels(1)
     out_path = input_path + "_converted.wav"
-    audio.export(out_path, format="wav")
+    subprocess.run(
+        [
+            FFMPEG_PATH, "-y", "-i", input_path,
+            "-ar", "16000", "-ac", "1", out_path,
+        ],
+        check=True,
+        capture_output=True,
+    )
     return out_path
 
 
